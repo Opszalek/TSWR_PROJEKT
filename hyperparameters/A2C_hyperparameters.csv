@@ -11,7 +11,7 @@ Hopper-v4,policy,MlpPolicy
 Hopper-v4,total_timesteps,1000000
 Hopper-v4,n_envs,1
 CartPole-v1,policy,MlpPolicy
-CartPole-v1,total_timesteps,100000
+CartPole-v1,total_timesteps,500000
 CartPole-v1,n_envs,8
 Acrobot-v1,policy,MlpPolicy
 Acrobot-v1,total_timesteps,1000000

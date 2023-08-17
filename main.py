@@ -2,6 +2,9 @@ import gymnasium as gym
 import multiprocessing
 import threading
 from stable_baselines3 import PPO
+from stable_baselines3 import A2C
+from stable_baselines3 import DDPG
+from stable_baselines3 import DQN
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common import results_plotter
@@ -12,64 +15,71 @@ import csv
 import os
 import matplotlib.pyplot as plt
 
-environments = ["Hopper-v4", "Swimmer-v4", "Cartpole-v1", "Acrobot-v1"]
-model_names = ["PPO", "DDPG", "A2C", "SAC"]
+environments = ["CartPole-v1"]#["Hopper-v4", "Swimmer-v4", "Cartpole-v1", "Acrobot-v1"]
+model_names = ["PPO", "DDPG", "A2C", "DQN"]
 
-def load_hyperparameters(environment_name, algoritm_name):
+
+def load_hyperparameters(environment_name, algorithm_name):
     hyperparameters = {}
 
-    with open('hyperparameters/' + algoritm_name + '_hyperparameters' + '.csv', mode='r') as csv_file:
+    with open('hyperparameters/' + algorithm_name + '_hyperparameters' + '.csv', mode='r') as csv_file:
         reader = csv.reader(csv_file)
         next(reader)
         for row in reader:
             env_name, param_key, param_value = row
+            print(env_name,environment_name)
             if env_name == environment_name:
                 hyperparameters[param_key] = param_value
+                print(11111)
+        print(hyperparameters)
+        time_steps = int(hyperparameters.pop("total_timesteps"))
 
-    return hyperparameters
+        n_envs = int(hyperparameters.pop("n_envs"))
 
-def ppo_create_model(environment_name, parameters):
-    time_steps = int(float(parameters.pop("total_timesteps")))
-    n_envs = parameters.pop("n_envs")
-    print(parameters)
-    vec_env = make_vec_env(environment_name, n_envs=int(n_envs))
-    model = PPO(env=vec_env, verbose=1, **parameters)
+    return hyperparameters, time_steps, n_envs
+
+
+def learn_model(environment_name, parameters, rl_algorithm):
+    hyperparameters, time_steps, n_envs = parameters
+    vec_env = make_vec_env(environment_name, n_envs=n_envs)
+    model = rl_algorithm(env=vec_env, verbose=1, **hyperparameters)
+
     model.learn(total_timesteps=time_steps)  # Uczenie modelu
-    model.save('models/' + environment_name + "_model")  # Zapisanie modelu
+    model.save('models/'+str(rl_algorithm.__name__)+'/' + environment_name + "_model")  # Zapisanie modelu
     vec_env.close()
 
-def ppo_algoritm(environments):
+
+def create_model(environment_name, model_name):
+    if model_name == "PPO":
+        learn_model(environment_name, load_hyperparameters(environment_name, "PPO"), PPO)
+    elif model_name == "DDPG" and environment_name != "CartPole-v1" and environment_name != "Acrobot-v1":
+        learn_model(environment_name, load_hyperparameters(environment_name, "DDPG"), DDPG)
+    elif model_name == "A2C":
+        learn_model(environment_name, load_hyperparameters(environment_name, "A2C"), A2C)
+    elif model_name == "DQN" and environment_name == "CartPole-v1" and environment_name == "Acrobot-v1":
+        learn_model(environment_name, load_hyperparameters(environment_name, "DQN"), DQN)
 
 
-
-    for environment_name in environments:
-        parameters = load_hyperparameters(environment_name, "PPO")
-        time_steps = int(float(parameters.pop("total_timesteps")))
-        n_envs = parameters.pop("n_envs")
-        print(parameters)
-        vec_env = make_vec_env(environment_name, n_envs=int(n_envs))
-        model = PPO(env=vec_env,verbose=1,**parameters)
-        model.learn(total_timesteps=time_steps)  # Uczenie modelu
-        model.save('models/' + environment_name + "_model")  # Zapisanie modelu
-        vec_env.close()
-
-def create_model(environment_name,model_name):
-
-    pass
-def test_models():
-    for environment_name in environments:
-        for model in model_names:
-            # print(model,environment_name)
-            if not os.path.exists('models/'+model+'/'+environment_name+'_model.zip'):
-                pass
+def test_models(environment_name, model_name):
+    model = PPO.load('models/' + model_name + '/' + environment_name + "_model")
+    env = gym.make(environment_name, render_mode="human")
+    obs, info = env.reset()
+    for _ in range(10000):
+        action, _ = model.predict(obs, deterministic=True)
+        obs, reward, terminated, truncated, info = env.step(action)
+        if terminated or truncated:
+            break
+        env.render()
+    env.close()
 
 
 def main():
-    # ppo_models(environments)##
-    # ddpg_models(environments)
-    # a2c_models(environments) ##
-    # sac_models(environments)
-    test_models()
+    for environment_name in environments:
+        for model in model_names:
+            if not os.path.exists('models/' + model + '/' + environment_name + '_model.zip'):
+                create_model(environment_name, model)
+            else:
+                test_models(environment_name, model)
     params = load_hyperparameters("Swimmer-v4", "PPO")
     print(params)
 
