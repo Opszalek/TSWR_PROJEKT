@@ -1,4 +1,0 @@
-Algorithm,Parameter,Value
-CartPole-v1,policy,MlpPolicy
-CartPole-v1,total_timesteps,100000
-CartPole-v1,n_envs,8

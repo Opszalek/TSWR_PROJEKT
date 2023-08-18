@@ -1,0 +1,26 @@
+Algorithm,Parameter,Value
+Acrobot-v1,batch_size,128
+Acrobot-v1,buffer_size,50000
+Acrobot-v1,exploration_final_eps,0.1
+Acrobot-v1,exploration_fraction,0.12
+Acrobot-v1,gamma,0.99
+Acrobot-v1,gradient_steps,-1
+Acrobot-v1,learning_rate,0.00063
+Acrobot-v1,learning_starts,0
+Acrobot-v1,total_timesteps,100000.0
+Acrobot-v1,policy_kwargs,dict(net_arch=[256, 256])
+Acrobot-v1,target_update_interval,250
+Acrobot-v1,train_freq,4
+CartPole-v1,batch_size,64
+CartPole-v1,buffer_size,100000
+CartPole-v1,exploration_final_eps,0.04
+CartPole-v1,exploration_fraction,0.16
+CartPole-v1,gamma,0.99
+CartPole-v1,gradient_steps,128
+CartPole-v1,learning_rate,0.0023
+CartPole-v1,learning_starts,1000
+CartPole-v1,n_envs,1
+CartPole-v1,total_timesteps,50000.0
+CartPole-v1,policy_kwargs,dict(net_arch=[256, 256])
+CartPole-v1,target_update_interval,10
+CartPole-v1,train_freq,256
