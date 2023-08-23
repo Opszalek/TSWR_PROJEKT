@@ -3,6 +3,9 @@ Swimmer-v4,gamma,0.9999
 Swimmer-v4,learning_starts,10000
 Swimmer-v4,total_timesteps,1000000
 Swimmer-v4,n_envs,1
+Swimmer-v4,tau,0.001
 Hopper-v4,learning_starts,10000
 Hopper-v4,total_timesteps,1000000.0
 Hopper-v4,n_envs,1
+Hopper-v4,tau,0.001
+Hopper-v4,noise_type,ou_0.2
